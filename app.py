@@ -71,37 +71,7 @@ elif analisis_seleccionado == "Análisis de nombres": # Un mapa en Dash
     lottie_airplane = load_lottieurl('https://assets4.lottiefiles.com/packages/lf20_jhu1lqdz.json')
     st_lottie(lottie_airplane, speed=1, height=200, key="initial")
 
-    
-    
-    file = st.file_uploader('Por favor, suba su archivo de Excel en formato “.CSV” ', type="csv") 
-    if file is not None: 
-        df_A = pd.read_csv(file, encoding= 'unicode_escape') 
-    else: 
-        st.stop()
 
-    text = """
-    La siguiente Tabla muestra los primeros cinco (5) registros de la información que acaba de subir.
-    """
-    st.markdown(text) #Para mostrar el texto      
-    st.write(df_A.head()) # Imprimir las primeras 5 filas del archivo. 
-    
-    df_A.to_csv( "Base_a_analizar.csv", encoding='unicode_escape') 
-    
-
-    #----------------------------------------------------------------------------------------
-    
-    st.subheader("Aquí encontrará los registros únicos")
-    
-    text = """
-    En esta sección encuentra los registros no repetidos
-    """
-    st.markdown(text) #Para mostrar el texto    
-  
-    text = """
-    Archivo con registros no repetidos
-    """
-    st.markdown(text) #Para mostrar el texto   
-        
     import Algoritmo # Aquí está toda la programación para comparar los nombres
     
     
@@ -129,5 +99,3 @@ elif analisis_seleccionado == "VEIN - Analítica":
     
     """
     st.markdown(text) #Para mostrar el texto   
-    
-    
