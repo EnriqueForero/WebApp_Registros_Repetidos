@@ -15,7 +15,40 @@ import missingno as msno
 
 """### ✅ I.1 Cargar archivos - Excel"""
 
-df_A = pd.read_csv("Base_a_analizar.csv", encoding= 'unicode_escape') 
+st.markdown("El archivo a analizar debe contener al menos las siguientes variables con esos mismos nombres")
+st.write(pd.DataFrame({'Nombres de las variables': ['NAME','FIRSTNAME','LASTNAME','EMAIL','CIUDAD__C']}))
+
+file = st.file_uploader('Por favor, suba su archivo de Excel guardado en formato “.CSV” ', type="csv") 
+if file is not None: 
+    df_A = pd.read_csv(file, encoding= 'unicode_escape') 
+else: 
+    st.stop()
+
+text = """
+La siguiente Tabla muestra los primeros cinco (5) registros de la información que acaba de subir.
+"""
+st.markdown(text) #Para mostrar el texto      
+st.write(df_A.head()) # Imprimir las primeras 5 filas del archivo. 
+
+df_A.to_csv( "Base_a_analizar.csv", encoding='unicode_escape') 
+
+
+#----------------------------------------------------------------------------------------
+
+st.subheader("Aquí encontrará los registros únicos")
+
+text = """
+En esta sección encuentra los registros no repetidos
+"""
+st.markdown(text) #Para mostrar el texto    
+
+text = """
+Archivo con registros no repetidos
+"""
+st.markdown(text) #Para mostrar el texto   
+
+
+#df_A = pd.read_csv("Base_a_analizar.csv", encoding= 'unicode_escape') 
 
 df_A['Orden'] = df_A.index
 
@@ -63,6 +96,8 @@ st.markdown("Cantidad de filas del archivo subido " + str(len(df_A)) + ". Se har
             + str(len(candidate_links)) + " comparaciones" )
 # (1000*1000-1000)/2 = 499500
 
+st.markdown(" #### Por favor, espere unos segundos mientras se muestran los resultados #### " )
+
 """The last step is to decide which records belong to the same person. In this example, we keep it simple:"""
 
 compare_cl = recordlinkage.Compare()
@@ -95,6 +130,8 @@ df_merge.shape
 # Hacer un merge para entender con cuál hay emparejamiento. 
 df_merge = pd.merge( df_A , reset_df[['Orden_A', 'Orden_B', 'Total' ]] , how = 'left' , 
               left_on = [ 'Orden' ] , right_on = [ 'Orden_A' ])
+
+st.subheader("Resultados") 
 
 st.markdown("Cantidad de coincidencias entre los registros " + str(df_merge.shape[0]))
 
@@ -130,3 +167,4 @@ st.markdown("Tabla con los registros")
 #st.dataframe(df_merge) # Mostrar el DataFrame. # Aquí debo referenciar el DataFrame con los resultados. 
 csv_downloader(df_merge, "#### Descargar las coincidencias entre los registros ###") # Aquí se llama la función para descargar los datos. 
 
+st.balloons()
