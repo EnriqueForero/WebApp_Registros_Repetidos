@@ -1,10 +1,9 @@
-# Libreria principal para hacer la aplicación Web. 
+# Main library to make the Web application.
 import streamlit as st
 import streamlit.components as stc
 from streamlit_lottie import st_lottie
-# Libreria para manipular datos. 
+# Library to manipulate data.
 import pandas as pd
-# Libreria para hacer cálculos numéricos
 import numpy as np
 import plotly.express as px
 from plotly.subplots import make_subplots
@@ -17,30 +16,29 @@ import time
 import requests
 timestr = time.strftime("%Y%m%d-%H%M%S")
 
-# La siguiente línea invoca un módulo de pandas. Cambia Default para que quede plotly. 
 pd.options.plotting.backend = "plotly"
 
 ##################################################################################
-# Démosle un título a nuestra aplicación
+# Let's give our app a title
 st.title("Aplicación Web para identificar registros repetidos y únicos")
-# Creemos una barra lateral
+# Let's create a sidebar
 st.sidebar.header("Comparación de nombres")
 
-from PIL import Image # Le ponemos una imagen
-img = Image.open("ProColombia.png") # Abre la imagen guardada. 
-st.sidebar.image(img, width=200) #Se le indica que va en la parte lateral. 
+from PIL import Image # We put an image
+img = Image.open("ProColombia.png") # Open the saved image.
+st.sidebar.image(img, width=200) # It is indicated that it goes on the side.
 
 
 ##################################################################################
 
-#Interactividad con el usuario
-opciones_analisis = ['Introducción', "Análisis de nombres", 'VEIN - Analítica'] # Y una lista desplegable con los análisis a mostrar. 
+# Interactivity with the user
+opciones_analisis = ['Introducción', "Análisis de nombres", 'VEIN - Analítica'] # And a drop-down list with the analyzes to show.
 
 
-analisis_seleccionado = st.sidebar.selectbox('Por favor, seleccione una de las opciones de la lista:', opciones_analisis) # La lista de opciones desplegables se coloca en esta parte. 
+analisis_seleccionado = st.sidebar.selectbox('Por favor, seleccione una de las opciones de la lista:', opciones_analisis) # The list of drop down options is placed in this part.
 
-# Lo primero es crear el análisis de bienvenida. 
-if analisis_seleccionado == 'Introducción': #Lógica para asignar lo que se va a mostrar. 
+# The first thing is to create the introduction section.
+if analisis_seleccionado == 'Introducción': # Logic to assign what to display.
     st.header("Introducción")
     
     st.header("Autores: Coordinación De Analítica")
@@ -48,16 +46,15 @@ if analisis_seleccionado == 'Introducción': #Lógica para asignar lo que se va 
     st.subheader("Bienvenidos")
 
     text = """
-    Con este aplicativo podrá subir un archivo de formato ".CSV" para encontrar los registros que estén repetidos.
-    Por favor, `Seleccione` el archivo sobre el que va a trabajar.
+    Con este aplicativo podrá subir un archivo ".CSV" para encontrar los registros que estén repetidos.
     
-    Para iniciar, por favor, seleccione en la barra lateral izquierda la opción "Análisis de nombres" de la lista desplegable.    
+    Para iniciar, por favor, `Seleccione` en la barra lateral izquierda la opción "Análisis de nombres" de la lista desplegable.    
     
     """
-    st.markdown(text) #Para mostrar el texto   
+    st.markdown(text) 
 
 ##################################################################################    
-    #Sección número dos.  
+
 elif analisis_seleccionado == "Análisis de nombres": # Un mapa en Dash
     st.subheader("Sección para subir archivo")
     
@@ -72,7 +69,7 @@ elif analisis_seleccionado == "Análisis de nombres": # Un mapa en Dash
     st_lottie(lottie_airplane, speed=1, height=200, key="initial")
 
 
-    import Algoritmo # Aquí está toda la programación para comparar los nombres
+    import Algoritmo # Here is all the code to compare the names
     
     
     #----------------------------------------------------------------------------------------
@@ -87,7 +84,7 @@ elif analisis_seleccionado == "Análisis de nombres": # Un mapa en Dash
     #st.dataframe(df_A)    
    
     
-    # Se puede añadir seguridad como clave para acceso.   
+    # Security can be added as a password for access.  
     
 ##################################################################################
 elif analisis_seleccionado == "VEIN - Analítica": 
@@ -98,4 +95,4 @@ elif analisis_seleccionado == "VEIN - Analítica":
 "   
     
     """
-    st.markdown(text) #Para mostrar el texto   
+    st.markdown(text) 
