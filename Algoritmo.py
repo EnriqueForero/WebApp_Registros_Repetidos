@@ -1,22 +1,22 @@
-"""2021-08-22 Limpieza y Comparación de nombres 
-*Enrique Forero*
+"""2021-08-22 Clean and compare names 
+*AUthor: Enrique Forero*
 *Date: 2021-08-19*
 """
-"""### ✅ Cargando librerias necesarias"""
+"""### ✅ Main libraries """
 import streamlit as st
 import pandas as pd
 import recordlinkage as rl
 import missingno as msno
 
-"""# ⏯ Programación
+"""# ⏯ Main Code
 
-### ✅ 0.1. Instalar paquete necesario:
+### ✅ 0.1. Install all required libraries:
 """
 
-"""### ✅ I.1 Cargar archivos - Excel"""
+"""### ✅ I.1 Upload files - Excel"""
 
 st.markdown("El archivo a analizar debe contener al menos las siguientes variables con esos mismos nombres")
-st.write(pd.DataFrame({'Nombres de las variables': ['NAME','FIRSTNAME','LASTNAME','EMAIL','CIUDAD__C']}))
+st.write(pd.DataFrame({'Nombres de las variables': ['NAME','FIRSTNAME','LASTNAME','EMAIL','CITY']}))
 
 file = st.file_uploader('Por favor, suba su archivo de Excel guardado en formato “.CSV” ', type="csv") 
 if file is not None: 
@@ -27,8 +27,8 @@ else:
 text = """
 La siguiente Tabla muestra los primeros cinco (5) registros de la información que acaba de subir.
 """
-st.markdown(text) #Para mostrar el texto      
-st.write(df_A.head()) # Imprimir las primeras 5 filas del archivo. 
+st.markdown(text) # Display text    
+st.write(df_A.head()) # Print the first five observations 
 
 df_A.to_csv( "Base_a_analizar.csv", encoding='unicode_escape') 
 
@@ -40,38 +40,34 @@ st.subheader("Aquí encontrará los registros únicos")
 text = """
 En esta sección encuentra los registros no repetidos
 """
-st.markdown(text) #Para mostrar el texto    
+st.markdown(text)   
 
 text = """
 Archivo con registros no repetidos
 """
-st.markdown(text) #Para mostrar el texto   
+st.markdown(text)   
 
-
-#df_A = pd.read_csv("Base_a_analizar.csv", encoding= 'unicode_escape') 
 
 df_A['Orden'] = df_A.index
 
 
-"""# ⏯ **I. Limpiar Nombres**
+"""# ⏯ **I. Clean names**
 
-### ✅ I.2 CLEANCO - Limpiar nombres corporativos
-
-#### 🟡 I.2.a Librerias necesarias
+#### 🟡 I.2.a Libraries
 """
 
 from cleanco import prepare_terms, basename
 from cleanco import cleanco
 from cleanco import prepare_terms, basename
 
-"""#### 🟡 I.2.e Creando la columna - Nombre Ajustado"""
+"""#### 🟡 I.2.e Creating the column "Nombre Ajustado" """
 
-# Volviendo a ajustar los nombres con el proceso más básico. 
+# Creating a new variables named "Nombre Ajustado" using the basic process to clean "NAME".
 df_A['Nombre ajustado'] = df_A['NAME'].apply(lambda x: cleanco(x).clean_name() if type(x)==str else x)
 
-"""# 🆕 Utilizando la librería de deduplicación - Datos reales
+"""# 🆕 Deduplication
 
-## Cargar paquetes necesarios y base de datos
+## 
 """
 
 dfA = df_A.copy()
@@ -82,16 +78,16 @@ dfA.shape
 
 """One of the most well known indexing methods is named blocking. This method includes only record pairs that are identical on one or more stored attributes of the person (or entity in general). The blocking method can be used in the recordlinkage module."""
 
-# Como no tenemos una variable para hacer un bloque, creemos una
+# Since we don't have a variable to make a block, let's create one
 dfA["bloque"] = "Grupo único"
 
-# Para no generar tantos emparejamientos, utilizamos una variable por la cual agrupar y en la que las observaciones deben ser idénticas. En este caso la variable es "Grupo único"
+# In order not to generate so many matches, we use a variable by which to group and in which the observations must be identical. In this case the variable is "Unique group"
 import recordlinkage 
 indexer = recordlinkage.Index()
 indexer.block('bloque') # The argument ‘given_name’ is the blocking variable.
 candidate_links = indexer.index(dfA)
 
-# Revisando la cantidad de enlaces que se crearon
+# Checking out the number of links that were created
 st.markdown("Cantidad de filas del archivo subido " + str(len(df_A)) + ". Se harán " 
             + str(len(candidate_links)) + " comparaciones" )
 # (1000*1000-1000)/2 = 499500
@@ -107,35 +103,35 @@ compare_cl.string('Nombre ajustado', 'Nombre ajustado', method='levenshtein', th
 compare_cl.string('FIRSTNAME', 'FIRSTNAME', method='jarowinkler', threshold=0.85, label='FIRSTNAME')
 compare_cl.string('NAME', 'NAME', method='levenshtein', threshold=0.85, label='NAME')
 compare_cl.string('EMAIL', 'EMAIL', method='damerau_levenshtein', threshold=0.85, label='EMAIL')
-compare_cl.exact('CIUDAD__C', 'CIUDAD__C', label='CIUDAD__C')
+compare_cl.exact('CITY', 'CITY', label='CITY')
 
 features = compare_cl.compute(candidate_links, dfA)
 
-# Vamos a tomar las observaciones que tengan más de 3 criterios que pasaron la validación. 
+# We are going to take the observations that have more than 3 criteria that passed the validation. 
 matches = features[features.sum(axis=1) > 2]
 
-# Sumar columnas
+# Sum columns
 matches['Total'] = matches.apply(lambda x: x.sum(), axis=1)
 
-# Convertir los índices en variables para poder hacer el empalme. 
+# Convert the indexes into variables to be able to do the match.
 reset_df = matches.reset_index()
 
-# Renombrar las columnas
+# Rename columns
 reset_df = reset_df.rename({'level_0': 'Orden_A', 'level_1': 'Orden_B'}, axis=1)
 
-# Copia de seguridad
+# Copy
 df_merge = df_A.copy()
 df_merge.shape
 
-# Hacer un merge para entender con cuál hay emparejamiento. 
+# Make a merge to understand which one there is a match with.
 df_merge = pd.merge( df_A , reset_df[['Orden_A', 'Orden_B', 'Total' ]] , how = 'left' , 
               left_on = [ 'Orden' ] , right_on = [ 'Orden_A' ])
 
 st.subheader("Resultados") 
 
-st.markdown("Cantidad de coincidencias entre los registros " + str(df_merge.shape[0]))
+st.markdown("Se encontraron " + str(df_merge.shape[0]) + " coincidencias entre los registros." )
 
-# Conteo de Registros únicos
+# Unique Record Count
 df_merge["Total"].isna().sum()
 
 df_valores_unidos = df_merge[df_merge['Total'].isnull()]
@@ -146,7 +142,7 @@ import base64
 import time
 timestr = time.strftime("%Y%m%d-%H%M%S")
 
-# Esta es la función para descargar los archivos a CSV. 
+# This is the function to download the files to CSV.
 def csv_downloader(data, mensaje):
     csvfile = data.to_csv()
     b64 = base64.b64encode(csvfile.encode()).decode()
@@ -155,16 +151,17 @@ def csv_downloader(data, mensaje):
     href = f'<a href="data:file/csv;base64,{b64}" download="{new_filename}">¡Hacer clic aquí!</a>'
     st.markdown(href,unsafe_allow_html=True)
 
-# Revisando la cantidad de enlaces que se crearon
+# Checking the number of links that were created
 st.markdown("La cantidad de registros únicos son " + str(len(df_valores_unidos)) 
             + ", esto representa el  " + str(len(df_valores_unidos)/len(df_A)) + " del total analizado.")
-# (1000*1000-1000)/2 = 499500
 
-csv_downloader(df_valores_unidos, "#### Descargar registros únicos ###") # Aquí se llama la función para descargar los datos. 
+csv_downloader(df_valores_unidos, "#### Descargar registros únicos ###") # Using the function to download the data. 
 
 st.markdown("")
 st.markdown("Tabla con los registros")
-#st.dataframe(df_merge) # Mostrar el DataFrame. # Aquí debo referenciar el DataFrame con los resultados. 
-csv_downloader(df_merge, "#### Descargar las coincidencias entre los registros ###") # Aquí se llama la función para descargar los datos. 
+#st.dataframe(df_merge) # Show the DataFrame. # Here I must reference the DataFrame with the results.
+csv_downloader(df_merge, "#### Descargar las coincidencias entre los registros ###") #  
+st.markdown("Las coincidencias entres los registros se da entre pares con las variables `Orden_A` y `Orden_B` las cuales indican la ubicación de las observaciones, siendo cero la primera.")
+
 
 st.balloons()
