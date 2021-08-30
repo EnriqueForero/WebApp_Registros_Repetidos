@@ -95,4 +95,6 @@ elif analisis_seleccionado == "VEIN - Analítica":
 "   
     
     """
-    st.markdown(text) 
+    st.markdown(text) #Para mostrar el texto   
+    
+    
