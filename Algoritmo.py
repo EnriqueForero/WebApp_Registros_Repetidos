@@ -1,6 +1,6 @@
 """2021-08-22 Clean and compare names 
 *AUthor: Enrique Forero*
-*Date: 2021-08-19*
+*Date: 2021-08-22*
 """
 """### ✅ Main libraries """
 import streamlit as st
